@@ -16,3 +16,12 @@ class ContainerDataApp(private val context: Context):
         )
     }
 }
+
+class AplikasiSiswa : Application() {
+    /**
+     * AppContainer instance digunakan oleh kelas-kelas lainnya untuk mendpatkan*
+     */
+
+    lateinit var container: ContainerApp
+
+}
