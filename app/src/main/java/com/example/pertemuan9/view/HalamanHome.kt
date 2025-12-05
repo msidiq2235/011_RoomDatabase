@@ -36,17 +36,17 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.pertemuan9.R
+import com.example.pertemuan9.room.Siswa
 import com.example.pertemuan9.view.route.DestinasiHome
-import com.example.pertemuan9.viewmodel.HomeUIState
 import com.example.pertemuan9.viewmodel.HomeViewModel
 import com.example.pertemuan9.viewmodel.provider.PenyediaViewModel
-import com.example.pertemuan9.room.Siswa
-import com.example.pertemuan9.view.SiswaTopAppBar
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun HomeScreen(
-    navigateToltemEntry: () -> Unit,
+    // PERBAIKAN TYPO: navigateToltemEntry -> navigateToItemEntry
+    navigateToItemEntry: () -> Unit,
+    navigateToDetail: (Int) -> Unit,
     modifier: Modifier = Modifier,
     viewModel: HomeViewModel = viewModel(factory = PenyediaViewModel.Factory)
 ) {
@@ -64,7 +64,7 @@ fun HomeScreen(
         },
         floatingActionButton = {
             FloatingActionButton(
-                onClick = navigateToltemEntry,
+                onClick = navigateToItemEntry, // Panggil nama parameter yang sudah diperbaiki
                 shape = MaterialTheme.shapes.medium,
                 modifier = Modifier.padding(dimensionResource(id = R.dimen.padding_large))
             ) {
@@ -77,6 +77,7 @@ fun HomeScreen(
     ) { innerPadding ->
         HomeBody(
             listSiswa = homeUIState.listSiswa,
+            onSiswaClick = { id -> navigateToDetail(id) }, // id diteruskan ke navigateToDetail
             modifier = Modifier
                 .padding(innerPadding)
                 .fillMaxSize()
@@ -87,8 +88,8 @@ fun HomeScreen(
 @Composable
 fun HomeBody(
     listSiswa: List<Siswa>,
-    modifier: Modifier = Modifier,
-    onSiswaClick: (Int) -> Unit = {}
+    onSiswaClick: (Int) -> Unit,
+    modifier: Modifier = Modifier
 ) {
     Column(
         horizontalAlignment = Alignment.CenterHorizontally,
@@ -104,8 +105,8 @@ fun HomeBody(
         } else {
             ListSiswa(
                 listSiswa = listSiswa,
-                modifier = Modifier.padding(horizontal = dimensionResource(id = R.dimen.padding_small)),
-                onItemClick = { onSiswaClick(it.id) }
+                onItemClick = { siswa -> onSiswaClick(siswa.id) },
+                modifier = Modifier.padding(horizontal = dimensionResource(id = R.dimen.padding_small))
             )
         }
     }
@@ -114,8 +115,8 @@ fun HomeBody(
 @Composable
 fun ListSiswa(
     listSiswa: List<Siswa>,
-    modifier: Modifier = Modifier,
-    onItemClick: (Siswa) -> Unit
+    onItemClick: (Siswa) -> Unit,
+    modifier: Modifier = Modifier
 ) {
     LazyColumn(
         modifier = modifier,
@@ -144,9 +145,7 @@ fun DataItemSiswa(
             modifier = Modifier.padding(dimensionResource(id = R.dimen.padding_large)),
             verticalArrangement = Arrangement.spacedBy(dimensionResource(id = R.dimen.padding_small))
         ) {
-            Row(
-                modifier = Modifier.fillMaxWidth()
-            ) {
+            Row(modifier = Modifier.fillMaxWidth()) {
                 Text(
                     text = siswa.nama,
                     style = MaterialTheme.typography.titleLarge,
@@ -157,9 +156,7 @@ fun DataItemSiswa(
                     style = MaterialTheme.typography.titleMedium
                 )
             }
-            Row(
-                modifier = Modifier.fillMaxWidth()
-            ) {
+            Row(modifier = Modifier.fillMaxWidth()) {
                 Icon(
                     imageVector = Icons.Default.Phone,
                     contentDescription = null,
